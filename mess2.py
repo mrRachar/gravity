@@ -1,11 +1,7 @@
-import matplotlib
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 
-import numpy
-
-from particle import *
+from mechanics.particle import *
 
 data = [[] for _ in range(3)]
 

@@ -1,6 +1,8 @@
-from graph import MotionGraphHandler
-from particle import *
 import matplotlib.animation as animation
+
+from graph import MotionGraphHandler
+from mechanics.particle import *
+
 
 def simulate(n, tickable: Tickable, graph: MotionGraphHandler):
     universe.tick(n)

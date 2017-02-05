@@ -1,9 +1,8 @@
-import math as maths
 from abc import ABC, abstractmethod
-from typing import Optional, Union, List, Tuple
-from numbers import Number
+from typing import Optional, List
 
-from vectors import *
+from .vectors import *
+
 
 class Tickable(ABC):
     TICK_LENGTH = 0.1 #seconds
