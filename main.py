@@ -9,7 +9,8 @@ def simulate(handler, window):
         for particle in handler.particles:
             particle.apply_force(Force(10, Direction(20, 20)))
             particle.tick()
-        handler.axes.figure.drawify()
+            print(particle.position)
+        handler.update_positions()
         window.update()
 
 

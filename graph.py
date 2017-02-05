@@ -1,6 +1,9 @@
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from tkinter import *
 
 import numpy
@@ -28,23 +31,41 @@ class FigureTk(Figure):
 
 
 class MotionGraphHandler:
-    def __init__(self, axes: Axes3D, particles: list, *args, **kwargs):
+    def __init__(self, figure, axes: Axes3D):
+        self.figure = figure
         self.axes = axes
-        self.particles = particles
-        self.particle_lines = {particle: self.axes.plot(*([n] for n in particle.position.components))[0] for particle in particles}
+        self.particles = []
+        self.lines = []
 
-    def update_positions(self):
-        for particle in self.particles:
-            LineUtils.append_point(self.particle_lines[particle], particle.position)
-        self.axes.figure.draw(self.axes)  #figure.draw()
+    @classmethod
+    def create_graph(cls):
+        figure = plt.figure()
+        axes = figure.add_subplot(111, projection='3d')
+        return cls(figure, axes)
 
+    def add_particle(self, particle):
+        self.particles.append(particle)
+        self.lines.append(self.axes.plot([n] fparticle.c]))
 
-class LineUtils:
-    @staticmethod
-    def append_point(line, *points):
-        for point in points:
-            x, y, z = point
-            #x_data, y_data, z_data = line.get_xdata(), line.get_ydata(), line.get_zdata()
-            line.set_xdata(numpy.append(line.get_xdata(), x))
-            line.set_ydata(numpy.append(line.get_ydata(), y))
-            line.set_zorder(numpy.append(line.get_zdata(), z))
+class LineData:
+    xs = None
+    ys = None
+    zs = None
+
+    def __init__(self, xs: list, ys: list, zs: list):
+        self.xs = xs
+        self.ys = ys
+        self.zs = zs
+
+    @classmethod
+    def empty(cls):
+        return cls([], [], [])
+
+    def append(self, x, y, z):
+        self.xs.append(x)
+        self.ys.append(x)
+        self.zs.append(x)
+
+    @property
+    def points(self):
+        return zip(self.xs, self.ys, self.zs)
