@@ -1,39 +1,44 @@
-from graph import FigureTk, MotionGraphHandler
+from graph import MotionGraphHandler
 from particle import *
-from tkinter import *
-from time import sleep
+import matplotlib.animation as animation
 
-def simulate(handler, window):
-    while True:
-        sleep(Particle.TICK_LENGTH)
-        for particle in handler.particles:
-            particle.apply_force(Force(10, Direction(20, 20)))
-            particle.tick()
-            print(particle.position)
-        handler.update_positions()
-        window.update()
+def simulate(n, tickable: Tickable, graph: MotionGraphHandler):
+    universe.tick(n)
+    graph.update_positions()
+    print(n, graph.lines)
+    return [graph.lines]
 
 
 if __name__ == '__main__':
-    window = Tk()
-    figure = FigureTk(window)
-    axes = figure.add_subplot(111, projection='3d')
+    universe = Universe([Gravity(6.67408e-11)])
+    graph = MotionGraphHandler.create_graph(universe)
 
-    #a = axes.plot([5, 3, 2, 3, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5])
-    #b = axes.plot([1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [1, 2, 3, 4, 5])
-    #print(a, b)
+    universe <<= Particle(10, Coords(10, 5, 10))
+    universe <<= Particle(5, Coords(-10, -10, -10))
+    graph.ensure_lines()
 
-    figure.grid(row=0, column=0)
+    graph.axes.set_title('Gravitational Motion of Massive Particles')
 
-    handler = MotionGraphHandler(axes, [Particle(10)])
+    line_ani = animation.FuncAnimation(graph.figure, simulate, None, fargs=(universe, graph,),
+                                       interval=50, blit=False)
 
-    print(handler.particle_lines)
-    for particle, line in handler.particle_lines.items():
-        print(particle, dir(line))
+    graph.show()
 
-    axes.set_title('Gravitational Motion of Massive Particles')
 
-    play_button = Button(window, text="|>", command=lambda: simulate(handler, window))
-    play_button.grid(row=0, column=1)
 
-    mainloop()
+"""if __name__ == '__old__':
+    graph = MotionGraphHandler.create_graph()
+
+    particle = Particle(10, Coords(5, 5, 5))
+
+    graph.add_particle(particle)
+    line = graph.lines[0]
+
+    graph.axes.set_title('Gravitational Motion of Massive Particles')
+
+    line_ani = animation.FuncAnimation(graph.figure, simulate, None, fargs=(particle, line,),
+                                       interval=50, blit=False)
+
+
+    graph.show()
+"""
