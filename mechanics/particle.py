@@ -59,6 +59,7 @@ class Gravity(Field):
         force = Force(0, 0)
         force.direction = subject.position.direction_to(actor.position)
         force.magnitude = self.G * ((subject.mass * actor.mass)/pow(subject.position.distance_to(actor.position),2))
+        print(force)
         return force
 
 

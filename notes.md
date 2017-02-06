@@ -12,3 +12,8 @@ underdocumented and causing some problems
 With some time lost due to focus on other activities *(Chemisty Olympiad
 and Robotics)*, I am now getting back to working on **matplotlib**.
 
+## 6th of Feburary *(Birthday)*
+
+The graph is working well, but it seems that gravity is not working
+anywhere near as well as it should, maybe the force directions are wrong?
+The problems are either with the forces or the gravity calculation.
