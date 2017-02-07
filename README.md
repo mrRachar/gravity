@@ -11,7 +11,8 @@ It is designed to be highly extensible, and any part of it can be easily changed
  * You want a nice interactive GUI in which you can do all of this. ***Not yet...***
  
 ## Progress
-Generally OK. I mean, the 3-D forces, motion, distance, accelerations and positions work fine, the 
-matplotlib-base graphing is doing something, *finally*, however fields, or at least the built in
-gravitational field, doesn't seem to be doing what it should, which is a real shame, seeing as that
-is the whole point of this, isn't it.
+Simulating is fine. I still need to create a GUI to control things, but simulations such as the earth
+and the moon work, and graph, fine. I plan to also change how the process happens, with the whole
+process simulated first, and then controlled playback can occur, and the simulation can be saved. This
+should reduce the current problem of either having way to slow a simulation, but decent accuracy, or
+sacrificing on accuracy completely, for the sake of simulation time.

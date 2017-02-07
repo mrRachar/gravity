@@ -1,7 +1,7 @@
 import math as maths
 from numbers import Number
 
-from .bearing import bearing
+from .utils import bearing
 
 class Direction:
     plane: Number
@@ -120,7 +120,7 @@ class Vector3D:
             #direction.plane = maths.degrees(maths.acos(y / planar_magnitude))
             direction.plane = bearing(x, y)
         if magnitude:
-            direction.z = bearing(-z, planar_magnitude)
+            direction.z = bearing(z, planar_magnitude)
         return cls(magnitude, direction)
 
     def __repr__(self) -> str:

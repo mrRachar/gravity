@@ -5,7 +5,7 @@ from .vectors import *
 
 
 class Tickable(ABC):
-    TICK_LENGTH = 0.1 #seconds
+    TICK_LENGTH = 0.002e6 #seconds
 
     @abstractmethod
     def tick(self, t: int): pass
@@ -28,7 +28,7 @@ class Particle(Tickable):
     def tick(self, t: int=0): #tick number later?
         # ut + 1/2a(t^2)
         self.position += self.velocity.to_displacement(self.TICK_LENGTH) + self.acceleration.to_displacement(self.TICK_LENGTH)
-        self.velocity = self.acceleration.to_velocity(self.TICK_LENGTH)
+        self.velocity += self.acceleration.to_velocity(self.TICK_LENGTH)
         self.acceleration = Acceleration(0, 0)
 
     def apply_force(self, force: Force):
@@ -53,13 +53,15 @@ class Gravity(Field):
             for other in universe.particles:
                 if other is particle:
                     continue
+                #print(particle, other, self.calculate_force(particle, other))
                 particle.apply_force(self.calculate_force(particle, other))
+                #print(particle)
 
     def calculate_force(self, subject: Particle, actor: Particle) -> Force:
         force = Force(0, 0)
         force.direction = subject.position.direction_to(actor.position)
         force.magnitude = self.G * ((subject.mass * actor.mass)/pow(subject.position.distance_to(actor.position),2))
-        print(force)
+        #print(force)
         return force
 
 

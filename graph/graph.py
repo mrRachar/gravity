@@ -51,11 +51,13 @@ class Line3DHandler:
     ys = None
     zs = None
 
-    def __init__(self, axes, xs=None, ys=None, zs=None):
+    def __init__(self, axes, xs=None, ys=None, zs=None, **options):
         self.xs = xs or []
         self.ys = ys or []
         self.zs = zs or []
-        self.line = axes.plot(self.xs, self.ys, self.zs)[0]
+        self.line = axes.plot(self.xs, self.ys, self.zs, lw=3.5)[0] #, marker='o'
+        if options.get("dot") is not False:
+            pass
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(line={self.line}, points={list(self.points)})"
@@ -66,8 +68,8 @@ class Line3DHandler:
 
     def add_point(self, x, y, z):
         self.xs.append(x)
-        self.ys.append(x)
-        self.zs.append(x)
+        self.ys.append(y)
+        self.zs.append(z)
         self.update()
 
     def update(self):
