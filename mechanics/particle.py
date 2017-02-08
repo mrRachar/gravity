@@ -5,7 +5,7 @@ from .vectors import *
 
 
 class Tickable(ABC):
-    TICK_LENGTH = 0.002e6 #seconds
+    TICK_LENGTH = 100 #seconds
 
     @abstractmethod
     def tick(self, t: int): pass
@@ -15,8 +15,9 @@ class Particle(Tickable):
     position: Coords = Coords(0, 0, 0)
     velocity: Velocity = Velocity(0, 0)
     acceleration: Acceleration = Acceleration(0, 0)
+    colour: str
 
-    def __init__(self, mass: Number, position: Coords=None, velocity: Velocity=None, acceleration: Acceleration=None):
+    def __init__(self, mass: Number, position: Coords=None, velocity: Velocity=None, acceleration: Acceleration=None, colour: str="black"):
         self.mass = mass
         if position is not None:
             self.position = position
@@ -24,6 +25,7 @@ class Particle(Tickable):
             self.velocity = velocity
         if acceleration is not None:
             self.acceleration = acceleration
+        self.colour = colour
 
     def tick(self, t: int=0): #tick number later?
         # ut + 1/2a(t^2)
@@ -36,6 +38,10 @@ class Particle(Tickable):
 
     def __repr__(self) -> str:
         return "{}({}, {}, {}, {})".format(self.__class__.__name__, self.mass, self.position, self.velocity, self.acceleration)
+
+    @property
+    def relative_radius(self):
+        return pow((3 * self.mass)/(4 * maths.pi), 1/3)
 
 
 class Field(ABC):
