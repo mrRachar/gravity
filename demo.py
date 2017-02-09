@@ -8,7 +8,10 @@ def simulate(n, graph: MotionGraphHandler, universe: Universe):
     for x in range(int(2e2)):
         universe.tick(n)
     graph.update_positions()
-    return [line.line for line in graph.lines]
+    for line in graph.particle_lines.values():
+        for vals in (line.xs, line.ys, line.zs):
+            if len(vals) > 200:
+                vals.pop(0)
 
 
 if __name__ == '__main__':

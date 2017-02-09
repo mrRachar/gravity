@@ -5,10 +5,10 @@ from matplotlib.figure import Figure
 from tkinter import *
 import tkinter.ttk as ttk
 
-class FigureTk(Frame):
+class FigureTk(Figure, Frame):
     def __init__(self, master, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__init__(master, *args, **kwargs)
+        Frame.__init__(self, master, *args, **kwargs)
+        Figure.__init__(self)
         self.canvas = FigureCanvasTkAgg(self, master=self)
         self.canvas.get_tk_widget().pack(fill=BOTH)
         self.toolbar = NavigationToolbar2TkAgg(self.canvas, self)
@@ -18,10 +18,6 @@ class FigureTk(Frame):
     @property
     def widget(self):
         return self.canvas.get_tk_widget()
-
-    def pack(self, *args, **kwargs): self.pack(*args, **kwargs)
-    def grid(self, *args, **kwargs): self.grid(*args, **kwargs)
-    def grid_forget(self): self.frame.grid_forget()
 
     def drawify(self):
         self.canvas.draw()

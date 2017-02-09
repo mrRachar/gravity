@@ -1,14 +1,17 @@
 from abc import abstractmethod, ABC
-from typing import Tuple
+from typing import Tuple, List
 import math as maths
 
 import matplotlib.pyplot as plt
 from matplotlib import animation
+from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 
 from mechanics.particle import Universe, Particle
 
 class Animation(ABC):
+    playing: bool = True
+
     def __init__(self, interval: int=1, args: Tuple=(), f=None):
         if f:
             self.step = f
@@ -19,6 +22,20 @@ class Animation(ABC):
         self.step = f
         return self
 
+    def toggle(self) -> bool:
+        self.playing ^= True
+        return self.playing
+
+    def play(self):
+        self.playing = True
+
+    def pause(self):
+        self.playing = False
+
+    def do(self, *args, **kwargs):
+        if self.playing:
+            return self.step(*args, **kwargs)
+
     #@abstractmethod (in trust)
     def step(self, n: int, graph, universe: Universe): pass
 
@@ -26,19 +43,20 @@ class Animation(ABC):
 class MotionGraphHandler:
     universe: Universe
     axes: Axes3D
-    def __init__(self, universe: Universe, plot, figure, axes: Axes3D):
+    def __init__(self, universe: Universe, figure, axes: Axes3D, plot=None, animations: List[Animation]=None):
         self.universe = universe
         self.plot = plot
         self.figure = figure
         self.axes = axes
         self.particle_lines = {}
+        self.animations = animations or []
 
     @classmethod
     def create_graph(cls, universe: Universe):
         figure = plt.figure()
         axes = figure.add_subplot(111, projection='3d')
         axes.autoscale_view(True, True, True)
-        return cls(universe, plt, figure, axes)
+        return cls(universe, figure, axes, plt)
 
     def ensure_lines(self):
         for particle in self.universe.particles:
@@ -71,6 +89,7 @@ class MotionGraphHandler:
     def add_animation(self, animation_: Animation):
         self.__animation = animation.FuncAnimation(self.figure, animation_.step, None, fargs=(self, self.universe) + animation_.args,
                                 interval=1, blit=False)
+        self.animations.append(animation_)
 
 class PointMarker:
     x = 0
