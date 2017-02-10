@@ -7,6 +7,7 @@ from graph import MotionGraphHandler, Animation
 
 
 class SimulationAnimation(Animation):
+    playing = False
     def step(self, n: int, graph, universe):
         for x in range(int(2e2)):
             universe.tick(n)
@@ -24,6 +25,7 @@ class App:
         self.window = GravityWindow()
         self.axes = self.window.figure.add_subplot(111, projection='3d')
         self.graph = MotionGraphHandler(self.universe, figure=self.window.figure, axes=self.axes)
+        self.window.add_simulation(self.graph)
 
         self.universe <<= Particle(7.342e22, Coords(384.4e6, 0, (384.4e6 * maths.tan(maths.radians(5.14)))), Velocity(1022, 0), colour="grey")
         self.universe <<= Particle(5.97237e24, Coords(0, 0, 0), Velocity(0, 0), colour="blue")
@@ -36,3 +38,8 @@ class App:
         self.graph.axes.set_xlim3d([-5e8,5e8])
         self.graph.axes.set_zlim3d([-5e8,5e8])
         mainloop()
+
+    def run(self):
+        self.window = GravityWindow()
+        self.axes = self.window.figure.add_subplot(111, projection='3d')
+        self.graph = MotionGraphHandler(self.universe, figure=self.window.figure, axes=self.axes)

@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.figure import Figure
 from tkinter import *
-import tkinter.ttk as ttk
 
 class FigureTk(Figure, Frame):
     def __init__(self, master, *args, **kwargs):
@@ -25,9 +24,12 @@ class FigureTk(Figure, Frame):
 class PlayControls(ABC, Frame):
     __is_playing: bool = False
 
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master, styling={}, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.play_button = ttk.Button(self, text="▶", command=self.__play)
+        self.play_button = Button(self, text="▶", command=self.__play, font=('Consolas', 15), width=2,
+                                  **styling
+                                  )
+        self.play_button.grid(row=0, column=0)
 
     @abstractmethod
     def play(self): pass
@@ -36,9 +38,9 @@ class PlayControls(ABC, Frame):
     def pause(self): pass
 
     def __play(self):
-        self.is_playing = not self.is_playing
+        self.__is_playing ^= True
         if self.is_playing:
-            self.play_button['text'] = '||'
+            self.play_button['text'] = '■'
             self.play()
         else:
             self.play_button['text'] = "▶"

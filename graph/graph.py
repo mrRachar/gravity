@@ -87,7 +87,7 @@ class MotionGraphHandler:
         self.plot.show()
 
     def add_animation(self, animation_: Animation):
-        self.__animation = animation.FuncAnimation(self.figure, animation_.step, None, fargs=(self, self.universe) + animation_.args,
+        self.__animation = animation.FuncAnimation(self.figure, animation_.do, None, fargs=(self, self.universe) + animation_.args,
                                 interval=1, blit=False)
         self.animations.append(animation_)
 
