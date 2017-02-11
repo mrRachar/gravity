@@ -8,6 +8,7 @@ from graph import MotionGraphHandler, Animation
 
 class SimulationAnimation(Animation):
     playing = False
+
     def step(self, n: int, graph, universe):
         for x in range(int(2e2)):
             universe.tick(n)
