@@ -2,7 +2,7 @@ import math as maths
 from tkinter import mainloop
 
 from mechanics import Gravity, Universe, Particle, Coords, Velocity
-from .interface import GravityWindow
+from interface.window import GravityWindow
 from graph import MotionGraphHandler, Animation
 
 
