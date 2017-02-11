@@ -1,4 +1,5 @@
-# gravity
+![logo](logo.svg)
+
 *I really didn't spend long enough on that name, did I...*
 
 ## What?
