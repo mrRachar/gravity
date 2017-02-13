@@ -1,3 +1,3 @@
 from app.app import App
 
-App().demo()
+app = App().demo()

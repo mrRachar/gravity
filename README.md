@@ -1,8 +1,10 @@
-# gravity
-*I really didn't spend long enough on that name, did I...*
+<div align="center">
+    <img src="http://campars.net/general-resources/gravitylogo.svg"/>
+    <p><em>I really didn't spend long enough on that name, did I...</em></p>
+</div>
 
 ## What?
-A library and application to allow the 3-D simulation of massive objects through a gravitational fields.
+A library and application to allow the 3-D simulation of massive objects through gravitational fields.
 It is designed to be highly extensible, and any part of it can be easily changed programmatically:
 
  * You want a different G value? Sure thing

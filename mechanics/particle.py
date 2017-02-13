@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional, List
+import copy
 
 from .vectors import *
 
@@ -10,7 +11,11 @@ class Tickable(ABC):
     @abstractmethod
     def tick(self, t: int): pass
 
-class Particle(Tickable):
+class Copyable(ABC):
+    @abstractmethod
+    def copy(self): pass
+
+class Particle(Tickable, Copyable):
     mass: Number = 0
     position: Coords = Coords(0, 0, 0)
     velocity: Velocity = Velocity(0, 0)
@@ -43,10 +48,16 @@ class Particle(Tickable):
     def relative_radius(self):
         return pow((3 * self.mass)/(4 * maths.pi), 1/3)
 
+    def copy(self):
+        return self.__class__(self.mass, copy.copy(self.position), copy.copy(self.velocity), copy.copy(self.acceleration), self.colour)
 
-class Field(ABC):
+
+class Field(Copyable, ABC):
     @abstractmethod
     def apply(self, universe): pass
+
+    def copy(self):
+        return self
 
 class Gravity(Field):
     G: Number
@@ -70,6 +81,9 @@ class Gravity(Field):
         #print(force)
         return force
 
+    def copy(self):
+        return self.__class__(self.G)
+
 
 class Universe(Tickable):
     particles: List[Particle]
@@ -92,4 +106,10 @@ class Universe(Tickable):
 
         for particle in self.particles:
             particle.tick(t)
+
+    def copy(self):
+        return Universe(
+            fields=[field.copy() for field in self.fields],
+            particles=[particle.copy() for particle in self.particles]
+        )
 
