@@ -3,7 +3,6 @@ from typing import Tuple, List
 import math as maths
 
 import matplotlib.pyplot as plt
-from matplotlib import animation
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -86,10 +85,20 @@ class MotionGraphHandler:
     def show(self):
         self.plot.show()
 
-    def add_animation(self, animation_: Animation):
-        self.__animation = animation.FuncAnimation(self.figure, animation_.do, None, fargs=(self, self.universe) + animation_.args,
+    def add_animation(self, animation: Animation):
+        self.__animation = FuncAnimation(self.figure, animation.do, None, fargs=(self, self.universe) + animation.args,
                                 interval=1, blit=False)
-        self.animations.append(animation_)
+        self.animations.append(animation)
+
+    def fit_all(self, coeff=1.2):
+        max_outlier = 0
+        for particle in self.particles:
+            max_outlier = max(max_outlier, abs(particle.position.x), abs(particle.position.x), abs(particle.position.z))
+            max_outlier *= coeff
+        self.axes.set_ylim3d(-max_outlier, max_outlier)
+        self.axes.set_xlim3d(-max_outlier, max_outlier)
+        self.axes.set_zlim3d(-max_outlier, max_outlier)
+
 
 class PointMarker:
     x = 0

@@ -1,46 +1,56 @@
 import math as maths
 from tkinter import mainloop
+from typing import List
 
-from mechanics import Gravity, Universe, Particle, Coords, Velocity
-from interface.window import GravityWindow
+from .interface.window import ExperimentWindow
+
+from app.experiment import Experiment
+from app.interface.style import Style
 from graph import MotionGraphHandler, Animation
+from mechanics import Gravity, Universe, Particle, Coords, Velocity
 
 
 class SimulationAnimation(Animation):
     playing = False
+    experiment: Experiment
+
+    def __init__(self, experiment: Experiment):
+        super().__init__()
+        self.experiment = experiment
 
     def step(self, n: int, graph, universe):
-        for x in range(int(2e2)):
+        for x in range(int(self.experiment.speed)):
             universe.tick(n)
         graph.update_positions()
 
-
 class App:
-    universe: Universe
-    window: GravityWindow
+    experiment_windows: List[ExperimentWindow]
+    welcome_window = None
+    style = None
 
     def __init__(self):
-        self.universe = Universe([Gravity(6.67408e-11)])
+        self.style = Style()
 
     def demo(self):
-        self.window = GravityWindow()
-        self.axes = self.window.figure.add_subplot(111, projection='3d')
-        self.graph = MotionGraphHandler(self.universe, figure=self.window.figure, axes=self.axes)
-        self.window.add_simulation(self.graph)
+        experiment = Experiment("Lunar Orbit", Universe([Gravity(6.67408e-11)]))
 
-        self.universe <<= Particle(7.342e22, Coords(384.4e6, 0, (384.4e6 * maths.tan(maths.radians(5.14)))), Velocity(1022, 0), colour="grey")
-        self.universe <<= Particle(5.97237e24, Coords(0, 0, 0), Velocity(0, 0), colour="blue")
-        self.graph.ensure_lines()
+        experiment.universe <<= Particle(7.342e22, Coords(384.4e6, 0, (384.4e6 * maths.tan(maths.radians(5.14)))), Velocity(1022, 0), colour="grey")
+        experiment.universe <<= Particle(5.97237e24, Coords(0, 0, 0), Velocity(0, 0), colour="blue")
+        self.load_experiment(experiment)
 
-        self.graph.axes.set_title('Simulated Lunar Orbit')
-        self.graph.add_animation(SimulationAnimation())
+    def load_experiment(self, experiment: Experiment):
+        universe = experiment.universe.copy()
+        window = ExperimentWindow(experiment, universe, style=self.style)
+        window.iconbitmap(default='./app/rsc/icon.ico')
+        axes = window.figure.add_subplot(111, projection='3d')
+        graph = MotionGraphHandler(universe, figure=window.figure, axes=axes)
+        window.add_simulation(graph)
+        graph.ensure_lines()
 
-        self.graph.axes.set_ylim3d([-5e8,5e8])
-        self.graph.axes.set_xlim3d([-5e8,5e8])
-        self.graph.axes.set_zlim3d([-5e8,5e8])
+        graph.figure.suptitle(experiment.name)
+        graph.add_animation(SimulationAnimation(experiment))
+
+        graph.fit_all()
+
         mainloop()
 
-    def run(self):
-        self.window = GravityWindow()
-        self.axes = self.window.figure.add_subplot(111, projection='3d')
-        self.graph = MotionGraphHandler(self.universe, figure=self.window.figure, axes=self.axes)

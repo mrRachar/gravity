@@ -26,7 +26,7 @@ class PlayControls(ABC, Frame):
 
     def __init__(self, master, styling={}, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.play_button = Button(self, text="▶", command=self.__play, font=('Consolas', 15), width=2,
+        self.play_button = Button(self, text="▶", command=self._play, font=('Consolas', 15), width=2,
                                   **styling
                                   )
         self.play_button.grid(row=0, column=0)
@@ -37,7 +37,7 @@ class PlayControls(ABC, Frame):
     @abstractmethod
     def pause(self): pass
 
-    def __play(self):
+    def _play(self):
         self.__is_playing ^= True
         if self.is_playing:
             self.play_button['text'] = '■'

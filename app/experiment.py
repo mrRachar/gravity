@@ -1,6 +1,5 @@
 from mechanics import Universe
 
-
 class Experiment:
     name: str
     universe: Universe = None
