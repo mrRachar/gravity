@@ -34,8 +34,8 @@ class App:
     def demo(self):
         experiment = Experiment("Lunar Orbit", Universe([Gravity(6.67408e-11)]))
 
-        experiment.universe <<= Particle(7.342e22, Coords(384.4e6, 0, (384.4e6 * maths.tan(maths.radians(5.14)))), Velocity(1022, 0), colour="grey")
-        experiment.universe <<= Particle(5.97237e24, Coords(0, 0, 0), Velocity(0, 0), colour="blue")
+        experiment.universe <<= Particle("moon", 7.342e22, Coords(384.4e6, 0, (384.4e6 * maths.tan(maths.radians(5.14)))), Velocity(1022, 0), colour="grey")
+        experiment.universe <<= Particle("earth", 5.97237e24, Coords(0, 0, 0), Velocity(0, 0), colour="blue")
         self.load_experiment(experiment)
 
     def load_experiment(self, experiment: Experiment):

@@ -140,3 +140,24 @@ class ResetableUserEntry(UserEntry):
         result = self.resetfunc(self, self.value)
         if isinstance(result, str):
             self.value = result
+
+class ResetableVector3DEntry(ResetableUserEntry, Vector3DEntry):
+    def __init__(self, master, label: str, resetfunc: Callable[[UserEntry, str], str], buttonconf=None, *args, **kwargs):
+        Vector3DEntry.__init__(self, master, label, *args, **kwargs)
+        buttonconf = (buttonconf or {}).copy()
+        buttonconf.update({
+            'width': 2,
+            'height': 1,
+            'padx': 0,
+            'pady': 0,
+        })
+        self.resetfunc = resetfunc
+        self.resetbutton = Button(self, text="⟳", command=self.onreset, **buttonconf)
+        self.resetbutton.pack(side=RIGHT, padx=2)
+        self.entry['width'] = int(self.entry['width'] - 6)
+        self.z.pack_forget()
+        self.z.pack(side=RIGHT)
+        self.y.pack_forget()
+        self.y.pack(side=RIGHT)
+        self.x.pack_forget()
+        self.x.pack(side=RIGHT)

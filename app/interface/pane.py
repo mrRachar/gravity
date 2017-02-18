@@ -1,10 +1,11 @@
 from tkinter import *
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
 from graph import MotionGraphHandler
 from app.experiment import Experiment
 from mechanics import Gravity, Universe
-from .input import UserEntry, Vector3DEntry, ResetableUserEntry
+from mechanics import Particle
+from .input import UserEntry, Vector3DEntry, ResetableUserEntry, ResetableVector3DEntry
 
 
 class StackReplacementException(Exception): pass
@@ -48,21 +49,56 @@ class ListPane(Frame):
     def __setitem__(self, index: int, widget: Widget):
         raise StackReplacementException("ListPane items cannot be replaced")
 
+    def __iter__(self):
+        return iter(self.widgets)
+
+    def clear(self):
+        for index, _ in reversed(list(enumerate(self))):
+            del self[index]
+
+
+class ParticleWidget(Frame):
+    colour_view: Frame
+    title: Union[Label, ResetableUserEntry]
+    mass: Union[Label, ResetableUserEntry]
+    velocity: Union[Label, ResetableVector3DEntry]
+    position: Union[Label, ResetableVector3DEntry]
+    tail: Union[Label, ResetableUserEntry]
+    buttons: Frame
+    apply_button: Button
+    test_button: Button
+    reset_button: Button
+    cancel_button: Button
+
+    universe_particle: Particle
+    experiment_particle: Particle
+
+    def __init__(self, master, experiment_particle: Particle, universe_particle: Particle, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        self.universe_particle = universe_particle
+        self.experiment_particle = experiment_particle
+
+        self.colour_view = Frame(self, bg=universe_particle.colour)
+        self.title = Label(self, text=experiment_particle.name)
+        self.mass = Label()
+
 
 class SimulationPane(ListPane):
-    __simulation = None
+    simulation: MotionGraphHandler
+    universe: Universe
+    experiment: Experiment
 
-    def __init__(self, master, simulation: MotionGraphHandler=None):
+    def __init__(self, master, experiment: Experiment, universe: Universe, simulation: MotionGraphHandler=None):
         super().__init__(master, 'Simulation')
         self.simulation = simulation
+        self.experiment = experiment
+        self.universe = universe
+        self.load_particles()
 
-    @property
-    def simulation(self) -> MotionGraphHandler:
-        return self.__simulation
-
-    @simulation.setter
-    def simulation(self, sim: MotionGraphHandler):
-        self.__simulation = sim
+    def load_particles(self):
+        self.clear()
+        for experiment_particle, universe_particle in zip(self.experiment.universe.particles, self.universe.particles):
+            self.append(ParticleWidget(self, experiment_particle, universe_particle))
 
 
 class ExperimentPane(ListPane):
