@@ -28,6 +28,17 @@ class Direction:
     def z_r(self, value):
         self.z_r = maths.degrees(value)
 
+    @property
+    def degrees(self):
+        return (self.plane, self.z)
+
+    @property
+    def radians(self):
+        return (self.plane_r, self.z_r)
+
+    def __iter__(self):
+        yield from self.degrees
+
     def __repr__(self) -> str:
         return "{}({}, {})".format(self.__class__.__name__, self.plane, self.z)
 

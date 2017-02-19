@@ -29,7 +29,7 @@ class EntryField(Entry):
 
     @value.setter
     def value(self, content: str):
-        if not content:
+        if content == "":
             self.enable_placeholder()
         else:
             self.disable_placeholder()
@@ -90,11 +90,20 @@ class UserEntry(Frame):
         self.__label = text
         self.entrylabel['text'] = text
 
+    def set(self, *value):
+        if len(value) == 1:
+            value = value[0]
+        self.value = value
+
 
 class Vector3DEntry(UserEntry):
     def __init__(self, master, label, entryconf: Dict[str, Any]=None, labelconf: Dict[str, Any]=None, **conf):
-        entryconf, labelconf = entryconf or {}, labelconf or {}
-        entryconf.update({'width': 4})
+        labelconf = labelconf or {}
+        entryconf = {
+            'width': 4,
+            **(entryconf or {}),
+            'justify': RIGHT
+        }
         super().__init__(master, label,
                          entryconf=entryconf,
                          labelconf=labelconf,
@@ -102,11 +111,13 @@ class Vector3DEntry(UserEntry):
                          **conf
                          )
         self.z = self.entry
-        self.y = EntryField(self, placeholder=' y', sticky=E, **entryconf)
-        self.x = EntryField(self, placeholder=' x', sticky=E, **entryconf)
+        self.y = EntryField(self, placeholder=' y', **entryconf)
+        self.x = EntryField(self, placeholder=' x', **entryconf)
+        self.z.config(**entryconf)
 
-        self.y.pack(side=RIGHT)
-        self.x.pack(side=RIGHT)
+        self.z.pack_configure(padx=2)
+        self.y.pack(side=RIGHT, padx=20)
+        self.x.pack(side=RIGHT, padx=2)
 
     @property
     def value(self) -> Tuple[str, str, str]:
@@ -142,7 +153,7 @@ class ResetableUserEntry(UserEntry):
             self.value = result
 
 class ResetableVector3DEntry(ResetableUserEntry, Vector3DEntry):
-    def __init__(self, master, label: str, resetfunc: Callable[[UserEntry, str], str], buttonconf=None, *args, **kwargs):
+    def __init__(self, master, label: str, resetfunc: Callable[[UserEntry, Tuple[str, str, str]], Tuple[str, str, str]], buttonconf=None, *args, **kwargs):
         Vector3DEntry.__init__(self, master, label, *args, **kwargs)
         buttonconf = (buttonconf or {}).copy()
         buttonconf.update({
@@ -161,3 +172,8 @@ class ResetableVector3DEntry(ResetableUserEntry, Vector3DEntry):
         self.y.pack(side=RIGHT)
         self.x.pack_forget()
         self.x.pack(side=RIGHT)
+
+    def onreset(self):
+        result = self.resetfunc(self, self.value)
+        if isinstance(result, tuple):
+            self.value = result

@@ -21,7 +21,7 @@ class Particle(Tickable, Copyable):
     velocity: Velocity = Velocity(0, 0)
     acceleration: Acceleration = Acceleration(0, 0)
     colour: str
-    name: str
+    __name: str
 
     def __init__(self, name: str, mass: Number, position: Coords=None, velocity: Velocity=None, acceleration: Acceleration=None, colour: str="black"):
         self.name = name
@@ -52,6 +52,14 @@ class Particle(Tickable, Copyable):
 
     def copy(self):
         return self.__class__(self.name, self.mass, copy.copy(self.position), copy.copy(self.velocity), copy.copy(self.acceleration), self.colour)
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value: str):
+        self.__name = value.title()
 
 
 class Field(Copyable, ABC):

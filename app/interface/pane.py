@@ -1,10 +1,10 @@
 from tkinter import *
+from tkinter.colorchooser import askcolor
 from typing import List, Dict, Any, Union
 
-from graph import MotionGraphHandler
+from graph import Line3DHandler, MotionGraphHandler
 from app.experiment import Experiment
-from mechanics import Gravity, Universe
-from mechanics import Particle
+from mechanics import Gravity, Universe, Particle, Velocity, Coords
 from .input import UserEntry, Vector3DEntry, ResetableUserEntry, ResetableVector3DEntry
 
 
@@ -14,8 +14,9 @@ class ListPane(Frame):
     titlename: str
     titlelabel: Label
     widgets: List[Widget]
+    start_from: str
 
-    def __init__(self, master, title: str, labelconf: Dict[str, Any]=None, **kwargs):
+    def __init__(self, master, title: str, labelconf: Dict[str, Any]=None, start_from=TOP, packconfig=None, **kwargs):
         config = {
             'padx': 5,
             'pady': 5,
@@ -30,13 +31,15 @@ class ListPane(Frame):
         }
         _labelconf.update(labelconf or {})
 
+        self.start_from=start_from
         self.widgets = []
         self.titlename = title
         self.titlelabel = Label(self, text=title, **_labelconf)
         self.titlelabel.pack(anchor=W)
+        self.packconfig = packconfig or {}
 
     def append(self, widget: Widget):
-        widget.pack(fill=X, expand=1, anchor=E)
+        widget.pack(fill=X, expand=1, anchor=E, side=self.start_from, **self.packconfig)
         self.widgets.append(widget)
 
     def __delitem__(self, index):
@@ -56,31 +59,10 @@ class ListPane(Frame):
         for index, _ in reversed(list(enumerate(self))):
             del self[index]
 
-
-class ParticleWidget(Frame):
-    colour_view: Frame
-    title: Union[Label, ResetableUserEntry]
-    mass: Union[Label, ResetableUserEntry]
-    velocity: Union[Label, ResetableVector3DEntry]
-    position: Union[Label, ResetableVector3DEntry]
-    tail: Union[Label, ResetableUserEntry]
-    buttons: Frame
-    apply_button: Button
-    test_button: Button
-    reset_button: Button
-    cancel_button: Button
-
-    universe_particle: Particle
-    experiment_particle: Particle
-
-    def __init__(self, master, experiment_particle: Particle, universe_particle: Particle, *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
-        self.universe_particle = universe_particle
-        self.experiment_particle = experiment_particle
-
-        self.colour_view = Frame(self, bg=universe_particle.colour)
-        self.title = Label(self, text=experiment_particle.name)
-        self.mass = Label()
+class SimpleListPane(ListPane):
+    def __init__(self, master, start_from: str=TOP, **kwargs):
+        super().__init__(master, '', start_from=start_from, **kwargs)
+        self.titlelabel.pack_forget()
 
 
 class SimulationPane(ListPane):
@@ -88,17 +70,35 @@ class SimulationPane(ListPane):
     universe: Universe
     experiment: Experiment
 
-    def __init__(self, master, experiment: Experiment, universe: Universe, simulation: MotionGraphHandler=None):
-        super().__init__(master, 'Simulation')
+    def __init__(self, master, experiment: Experiment, universe: Universe, simulation: MotionGraphHandler=None,
+                 entryconf: Dict[str, Any]=None,
+                 labelconf: Dict[str, Any]=None,
+                 specialbuttonconf: Dict[str, Any]=None,
+                 buttonconf: Dict[str, Any]=None,
+                 **kwargs
+                 ):
+        super().__init__(master, 'Simulation', labelconf=labelconf, **kwargs)
         self.simulation = simulation
         self.experiment = experiment
         self.universe = universe
-        self.load_particles()
+        self.entryconf = entryconf or {}
+        self.specialbuttonconf = specialbuttonconf or {}
+        self.buttonconf = buttonconf or {}
+        self.labelconf = labelconf or {}
+        self.frameconf = kwargs
 
     def load_particles(self):
         self.clear()
         for experiment_particle, universe_particle in zip(self.experiment.universe.particles, self.universe.particles):
-            self.append(ParticleWidget(self, experiment_particle, universe_particle))
+            self.append(ParticleWidget(self, self.experiment.universe, self.universe, self.simulation,
+                                       experiment_particle, universe_particle,
+                                       self.simulation.particle_lines[universe_particle],
+                                       entryconf=self.entryconf,
+                                       specialbuttonconf=self.specialbuttonconf,
+                                       buttonconf=self.buttonconf,
+                                       labelconf=self.labelconf,
+                                       **self.frameconf
+                                       ))
 
 
 class ExperimentPane(ListPane):
@@ -187,3 +187,6 @@ class UniversePane(ListPane):
 
     def test_values(self):
         self.gfield.G = float(self.gconstentry.value)
+
+# Safety Imports
+from .particle import ParticleWidget

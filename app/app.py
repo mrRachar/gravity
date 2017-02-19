@@ -1,11 +1,11 @@
 import math as maths
 from tkinter import mainloop
-from typing import List
+from typing import List, Iterable
 
+from .interface.pane import ParticleWidget
 from .interface.window import ExperimentWindow
-
-from app.experiment import Experiment
-from app.interface.style import Style
+from .experiment import Experiment
+from .interface.style import Style
 from graph import MotionGraphHandler, Animation
 from mechanics import Gravity, Universe, Particle, Coords, Velocity
 
@@ -13,15 +13,20 @@ from mechanics import Gravity, Universe, Particle, Coords, Velocity
 class SimulationAnimation(Animation):
     playing = False
     experiment: Experiment
+    particle_widgets: Iterable[ParticleWidget]
 
-    def __init__(self, experiment: Experiment):
+    def __init__(self, experiment: Experiment, particle_widgets: Iterable[ParticleWidget]):
         super().__init__()
         self.experiment = experiment
+        self.particle_widgets = particle_widgets
 
     def step(self, n: int, graph, universe):
         for x in range(int(self.experiment.speed)):
             universe.tick(n)
         graph.update_positions()
+        for particle_widget in self.particle_widgets:
+            particle_widget.update()
+
 
 class App:
     experiment_windows: List[ExperimentWindow]
@@ -30,6 +35,7 @@ class App:
 
     def __init__(self):
         self.style = Style()
+        self.experiment_windows = []
 
     def demo(self):
         experiment = Experiment("Lunar Orbit", Universe([Gravity(6.67408e-11)]))
@@ -48,9 +54,11 @@ class App:
         graph.ensure_lines()
 
         graph.figure.suptitle(experiment.name)
-        graph.add_animation(SimulationAnimation(experiment))
+        graph.add_animation(SimulationAnimation(experiment, window.simulation_pane))
 
         graph.fit_all()
+        window.simulation_pane.load_particles()
 
+        self.experiment_windows.append(window)
         mainloop()
 
