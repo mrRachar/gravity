@@ -160,3 +160,12 @@ class Line3DHandler:
     @property
     def points(self):
         return zip(self.xs, self.ys, self.zs)
+
+    @property
+    def colour(self):
+        return self.line.get_colour()
+
+    @colour.setter
+    def colour(self, value: str):
+        self.line.set_color(value)
+        self.marker.line.set_color(value)

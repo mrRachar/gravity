@@ -21,8 +21,10 @@ class Particle(Tickable, Copyable):
     velocity: Velocity = Velocity(0, 0)
     acceleration: Acceleration = Acceleration(0, 0)
     colour: str
+    __name: str
 
-    def __init__(self, mass: Number, position: Coords=None, velocity: Velocity=None, acceleration: Acceleration=None, colour: str="black"):
+    def __init__(self, name: str, mass: Number, position: Coords=None, velocity: Velocity=None, acceleration: Acceleration=None, colour: str="black"):
+        self.name = name
         self.mass = mass
         if position is not None:
             self.position = position
@@ -42,14 +44,22 @@ class Particle(Tickable, Copyable):
         self.acceleration += force.to_acceleration(self.mass)
 
     def __repr__(self) -> str:
-        return "{}({}, {}, {}, {})".format(self.__class__.__name__, self.mass, self.position, self.velocity, self.acceleration)
+        return "{}({!r}, {}, {}, {}, {})".format(self.__class__.__name__, self.name, self.mass, self.position, self.velocity, self.acceleration)
 
     @property
     def relative_radius(self):
         return pow((3 * self.mass)/(4 * maths.pi), 1/3)
 
     def copy(self):
-        return self.__class__(self.mass, copy.copy(self.position), copy.copy(self.velocity), copy.copy(self.acceleration), self.colour)
+        return self.__class__(self.name, self.mass, copy.copy(self.position), copy.copy(self.velocity), copy.copy(self.acceleration), self.colour)
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, value: str):
+        self.__name = value.title()
 
 
 class Field(Copyable, ABC):

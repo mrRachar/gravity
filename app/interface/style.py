@@ -1,16 +1,5 @@
 from typing import Callable, Dict, Union
 
-window_styling = {
-    'bg': "#4f4f4f",
-}
-widget_styling = {
-    'bg': "#444444",
-    'fg': "#eeeeee",
-    'relief': "groove",
-}
-graph_styling = {
-    'bg': '#efefef'
-}
 
 class Style:
     text = "#eeeeee"

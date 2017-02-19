@@ -8,10 +8,13 @@ from app.interface.style import Style
 from graph import FigureTk, MotionGraphHandler, PlayControls
 from mechanics import Universe
 from .controls import SimulationControls
-from .pane import ListPane, ExperimentPane, UniversePane
+from .pane import ListPane, ExperimentPane, UniversePane, SimulationPane
 
 
 class ExperimentWindow(Tk):
+    experiment: Experiment
+    universe: Universe
+
     figureframe: FigureTk
     controls: PlayControls = None
     simulation: MotionGraphHandler = None
@@ -25,10 +28,12 @@ class ExperimentWindow(Tk):
         super().__init__(*args, **kwargs)
 
         self.experiment = experiment
+        self.universe: universe
         self.style = style or Style()
 
         self.config(**self.style.frame_format)
         self.title(experiment.name)
+        self.resizable(True, False)
 
         self.figureframe = FigureTk(self)
         self.figure = self.figureframe.canvas.figure
@@ -48,12 +53,18 @@ class ExperimentWindow(Tk):
                                           entryconf=self.style.entry_format,
                                           **self.style.frame_format
                                           )
-        #self.simulation_pane = SimulationPane(self)
+        self.simulation_pane = SimulationPane(self, experiment, universe,
+                                              buttonconf=self.style.button_format,
+                                              labelconf=self.style.label_format,
+                                              entryconf=self.style.entry_format,
+                                              specialbuttonconf=self.style.special_button_format,
+                                              **self.style.frame_format
+                                              )
 
         self.leftpane.grid(row=0, column=0, sticky=N+S+E+W)
         self.experiment_pane.pack(fill=X)
         self.universe_pane.pack(fill=X)
-        #self.simulation_pane.grid(row=0, column=2, rowspan=2)
+        self.simulation_pane.grid(row=0, column=2, rowspan=2, sticky=N+E+W)
         self.figureframe.grid(row=0, column=1)
 
         if simulation:
@@ -65,7 +76,7 @@ class ExperimentWindow(Tk):
         super().title(f"gravity - {title}")
 
     def add_simulation(self, simulation: MotionGraphHandler):
-        #self.simulation_pane.simulation = simulation
+        self.simulation_pane.simulation = simulation
         self.controls = SimulationControls(self, simulation.animations, styling=self.style.button_format)
         self.controls.grid(column=1, row=2)
         self.simulation = simulation
