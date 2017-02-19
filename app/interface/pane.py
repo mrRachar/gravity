@@ -69,6 +69,7 @@ class SimulationPane(ListPane):
     simulation: MotionGraphHandler
     universe: Universe
     experiment: Experiment
+    buttons: Frame
 
     def __init__(self, master, experiment: Experiment, universe: Universe, simulation: MotionGraphHandler=None,
                  entryconf: Dict[str, Any]=None,
@@ -86,6 +87,78 @@ class SimulationPane(ListPane):
         self.buttonconf = buttonconf or {}
         self.labelconf = labelconf or {}
         self.frameconf = kwargs
+
+        self.buttons = Frame(self, self.frameconf)
+        self.buttons.pack(anchor=W, padx=5)
+        self.add_particle = Button(self.buttons, command=self.add_particle, text='+ Add', **self.buttonconf)
+        self.add_particle.pack(side=LEFT)
+
+    def add_particle(self):
+        window = Toplevel(**self.frameconf)
+
+        colour_view = Frame(window, bg='gray', width=15, height=15)
+
+        def colour_choose(self, *_):
+            colour_view['bg'] = askcolor(colour_view['bg'])[1]
+
+        colour_view.bind("<Button-1>", colour_choose)
+
+        titleentrystyle = {
+            'entryconf': {**self.entryconf, 'font': ('Arial', 12), 'justify': CENTER},
+            'labelconf': self.labelconf,
+            'buttonconf': self.buttonconf,
+            **self.frameconf
+        }
+        userentrystyle = {
+            'entryconf': self.entryconf,
+            'labelconf': self.labelconf,
+            'buttonconf': self.buttonconf,
+            **self.frameconf
+        }
+        vectorentrystyle = {
+            'entryconf': {'width': 10, **self.entryconf},
+            'labelconf': self.labelconf,
+            'buttonconf': self.buttonconf,
+            **self.frameconf
+        }
+        title = ResetableUserEntry(window, "", lambda *_: '', placeholder="Name", **titleentrystyle)
+        mass = ResetableUserEntry(window, "Mass", lambda *_: '0.0', **userentrystyle)
+        velocity = ResetableVector3DEntry(window, "Velocity",
+                                               lambda *_: tuple('0.0' for c in range(3)),
+                                               **vectorentrystyle
+                                               )
+        position = ResetableVector3DEntry(window, "Coordinates",
+                                               lambda *_: tuple('0.0' for c in range(3)),
+                                               **vectorentrystyle
+                                               )
+
+        title.value = ""
+        mass.value = "0.0"
+        velocity.value = tuple("0.0" for c in range(3))
+        position.value = tuple("0.0" for c in range(3))
+
+        def add_particle():
+            particle = Particle(
+                title.value,
+                float(mass.value),
+                Coords(*(float(c) for c in position.value)),
+                Velocity.from_components(*(float(c) for c in velocity.value)),
+                colour=colour_view['bg']
+            )
+            self.experiment.universe <<= particle
+            self.universe <<= particle.copy()
+            self.simulation.ensure_lines()
+            self.load_particles()
+            window.destroy()
+
+        button = Button(window, text="+ Add Particle", command=add_particle, **self.specialbuttonconf)
+
+        colour_view.grid(row=0, column=0, sticky=E, padx=5)
+        title.grid(row=0, column=1, sticky=W)
+        mass.grid(row=1, column=0, columnspan=2)
+        velocity.grid(row=3, column=0, columnspan=2)
+        position.grid(row=2, column=0, columnspan=2)
+        button.grid(row=4, column=1, sticky=E)
 
     def load_particles(self):
         self.clear()
