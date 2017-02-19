@@ -10,11 +10,14 @@ It is designed to be highly extensible, and any part of it can be easily changed
  * You want a different G value? Sure thing
  * You want multiple gravitational fields? Sure, I guess, but why not just change the G value...
  * You want to create you own kinds of mechanical fields? Definitely *(Just extend Field)*
- * You want a nice interactive GUI in which you can do all of this. ***Not yet...***
+ * You want a nice interactive GUI in which you can do all of this. Of course!
+ 
+## How to use?
+
+You'll need Python 3.6+ *(yes, 3.6)*, and matplotlib installed. I haven't tried it on a Mac, but I believe
+it should work fine on a Windows or Linux machine (tkinter on Mac works a little differently).
+To run it just run `main.py`.
  
 ## Progress
-Simulating is fine. I still need to create a GUI to control things, but simulations such as the earth
-and the moon work, and graph, fine. I plan to also change how the process happens, with the whole
-process simulated first, and then controlled playback can occur, and the simulation can be saved. This
-should reduce the current problem of either having way to slow a simulation, but decent accuracy, or
-sacrificing on accuracy completely, for the sake of simulation time.
+Simulating is fine. The GUI works,and simulations such as the earth and the moon work, and graph, fine. 
+It's not everything I planned, but it works well.
